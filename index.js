@@ -1,8 +1,10 @@
 class Main extends Phaser.Scene {
         preload () {
+            this.load.image('bg', 'assets/bg.png');
         }
 
         create () {
+            this.add.image(400, 300, 'sky');
         }
 }
 
