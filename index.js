@@ -1,4 +1,3 @@
-
 function randomFromArray(array) {
   return array[Math.floor(Math.random() * array.length)];
 }
@@ -10,7 +9,17 @@ function randomFromArray(array) {
     firebase.auth().onAuthStateChanged(function (user) {
         if (user) {
             // User is signed in.
+            playerID = user.uid;
+            playerRef = firebase.database().ref('players/' + playerID);
             
+            playerRef.set({
+                id: playerID,
+                name: "Anonymous",
+            })
+            .then(() => {
+                console.log("Player added to database");
+            })
+            playerRef.onDisconnect().remove();
         } else {
             // No user is signed in.
             
