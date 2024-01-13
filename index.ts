@@ -4,7 +4,7 @@ import { User, getAuth, onAuthStateChanged, signInAnonymously } from "firebase/a
 import { getDatabase, ref, set, onDisconnect } from "firebase/database";
 
 import { getAnalytics } from "firebase/analytics";
-import { Scene } from "phaser";
+import { GameObjects, Scene } from "phaser";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -27,13 +27,30 @@ const analytics = getAnalytics(app);
 
 // Initalize phaser.
 class Main extends Scene {
+    private cursors: Phaser.Types.Input.Keyboard.CursorKeys | null = null;
+    private ball: Phaser.Types.Physics.Arcade.ImageWithDynamicBody | null = null;
+
     preload() {
         this.load.image('bg', 'assets/bg.png');
+        this.load.image('ball', 'assets/ball.png');
     }
 
     create() {
         const bg = this.add.image(400, 300, 'bg');
         bg.setScale(.5);
+        this.ball = this.physics.add.image(400, 300, 'ball');
+        this.ball.setCollideWorldBounds(true);
+
+        this.cursors = this.input.keyboard!.createCursorKeys();
+    }
+
+    update(time: number, delta: number) {
+        if (this.cursors!.left.isDown) {
+            this.ball!.setVelocityX(-160);
+
+        } else if (this.cursors!.right.isDown) {
+            this.ball!.setVelocityX(160);
+        }
     }
 }
 
@@ -43,8 +60,8 @@ const config = {
     height: 600,
     scene: Main,
     physics: {
-        default: 'pool_table',
-        pool_table: {}
+        default: 'arcade',
+        arcade: {}
     }
 };
 
@@ -65,6 +82,7 @@ async function onAuthChange(user: User | null) {
 
 window.addEventListener('load', async () => {
     const game = new Phaser.Game(config);
+
 
     onAuthStateChanged(getAuth(), onAuthChange);
     try {
