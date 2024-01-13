@@ -7,13 +7,13 @@ import { getAnalytics } from "firebase/analytics";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyCGvK9BoWKmtOxotM6ZpvCuHIQIH8RxcIE",
-  authDomain: "ballpool-a072f.firebaseapp.com",
-  projectId: "ballpool-a072f",
-  storageBucket: "ballpool-a072f.appspot.com",
-  messagingSenderId: "79831655126",
-  appId: "1:79831655126:web:54ba1bb3cf2e1fc7215f77",
-  measurementId: "G-0QNVMXSGST"
+    apiKey: "AIzaSyCGvK9BoWKmtOxotM6ZpvCuHIQIH8RxcIE",
+    authDomain: "ballpool-a072f.firebaseapp.com",
+    projectId: "ballpool-a072f",
+    storageBucket: "ballpool-a072f.appspot.com",
+    messagingSenderId: "79831655126",
+    appId: "1:79831655126:web:54ba1bb3cf2e1fc7215f77",
+    measurementId: "G-0QNVMXSGST"
 };
 
 // Initialize Firebase
@@ -21,13 +21,13 @@ const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 
 class Main extends Phaser.Scene {
-        preload () {
-            this.load.image('bg', 'assets/bg.png');
-        }
+    preload() {
+        this.load.image('bg', 'assets/bg.png');
+    }
 
-        create () {
-            this.add.image(400, 300, 'sky');
-        }
+    create() {
+        this.add.image(400, 300, 'sky');
+    }
 }
 
 const config = {
@@ -46,7 +46,7 @@ window.addEventListener('load', () => {
 });
 
 function randomFromArray(array) {
-  return array[Math.floor(Math.random() * array.length)];
+    return array[Math.floor(Math.random() * array.length)];
 }
 
 (function () {
@@ -58,18 +58,18 @@ function randomFromArray(array) {
             // User is signed in.
             playerID = user.uid;
             playerRef = firebase.database().ref('players/' + playerID);
-            
+
             playerRef.set({
                 id: playerID,
                 name: "Anonymous",
             })
-            .then(() => {
-                console.log("Player added to database");
-            })
+                .then(() => {
+                    console.log("Player added to database");
+                })
             playerRef.onDisconnect().remove();
         } else {
             // No user is signed in.
-            
+
         }
     });
 
