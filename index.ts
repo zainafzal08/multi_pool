@@ -32,7 +32,8 @@ class Main extends Scene {
     }
 
     create() {
-        this.add.image(400, 300, 'bg');
+        const bg = this.add.image(400, 300, 'bg');
+        bg.setScale(.5);
     }
 }
 
