@@ -3,6 +3,9 @@ function randomFromArray(array) {
 }
 
 (function () {
+
+    let playerID;
+    let playerRef;
     firebase.auth().onAuthStateChanged(function (user) {
         if (user) {
             // User is signed in.
