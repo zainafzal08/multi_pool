@@ -1,3 +1,4 @@
 # multi_pool
 
-To run just run `python3 -m http.server` from this folder.
+To dev: `npm run dev`
+To build: `npm run build`
