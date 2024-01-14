@@ -29,7 +29,8 @@ const analytics = getAnalytics(app);
 // Initalize phaser.
 class Main extends Scene {
     /** The ball controlled by the current local player */
-    private localBall: Phaser.Physics.Matter.Image | null = null;
+    private localBall: Phaser.Physics.Matter.Sprite | null = null;
+    private ballList: Phaser.Physics.Matter.Image[] = [];
     private arrow: GameObjects.Image | null = null;
     private dragCircle: GameObjects.Graphics | null = null;
     private lastUserInput: { direction: Phaser.Math.Vector2, force: number } | null = null;
@@ -45,8 +46,7 @@ class Main extends Scene {
     create() {
         const bg = this.add.image(400, 300, 'bg');
         bg.setScale(.5);
-        this.localBall = this.matter.add.image(400, 300, 'ball');
-
+        this.createBalls();
         this.dragCircle = this.add.graphics();
         this.dragCircle.lineStyle(2, 0xffffff, 1);
         this.dragCircle.strokeCircle(0, 0, this.dragCircleRadius);
@@ -55,6 +55,13 @@ class Main extends Scene {
         this.arrow = this.add.image(400, 300, 'arrow');
         this.arrow.setVisible(false);
         this.arrow.setOrigin(0.5, 1);
+    }
+
+    createBalls() {
+        this.localBall = this.matter.add.sprite(400, 300, 'ball');
+        this.localBall.setCircle(500);
+        this.localBall.setFriction(0.005);
+        this.localBall.setBounce(0.9);
     }
 
     drawUI() {
@@ -146,9 +153,16 @@ async function onAuthChange(user: User | null) {
                 //this is the opponent add to ref of opponent
             }
         });
+        
         await set(playerRef, {
             id: playerID,
             name: "Anonymous",
+            ballX: 0,
+            ballY: 0,
+            ballVX: 0,
+            ballVY: 0,
+            ballForce: 0,
+            
         });
         console.log("Player added to database");
         onDisconnect(playerRef).remove();
