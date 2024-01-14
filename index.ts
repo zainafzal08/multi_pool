@@ -43,7 +43,6 @@ class Main extends Scene {
     }
 
     create() {
-
         const bg = this.add.image(400, 300, 'bg');
         bg.setScale(.5);
         this.localBall = this.matter.add.image(400, 300, 'ball');
