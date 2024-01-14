@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { User, getAuth, onAuthStateChanged, signInAnonymously } from "firebase/auth";
-import { getDatabase, ref, set, onDisconnect } from "firebase/database";
+import { getDatabase, ref, set, onDisconnect, onChildAdded } from "firebase/database";
 
 import { getAnalytics } from "firebase/analytics";
 import { GameObjects, Scene } from "phaser";
@@ -42,10 +42,7 @@ class Main extends Scene {
     }
 
     create() {
-        const allPlayers = firebase.da
-        allPlayers.on("child_added", function (snapshot) {
-            console.log(snapshot.val());
-        })
+
         const bg = this.add.image(400, 300, 'bg');
         bg.setScale(.5);
         this.ball = this.matter.add.image(400, 300, 'ball');
@@ -114,7 +111,15 @@ async function onAuthChange(user: User | null) {
         // User is signed in.
         const playerID = user.uid;
         const playerRef = ref(getDatabase(), 'players/' + playerID);
-
+        const allPlayers = ref(getDatabase(), 'players')
+        onChildAdded(allPlayers, (snapshot) => { 
+            if(snapshot.val().id == playerID){
+                //this is the player add + create local ref of ball
+            }
+            else{
+                //this is the opponent add to ref of opponent
+            }
+        });
         await set(playerRef, {
             id: playerID,
             name: "Anonymous",
