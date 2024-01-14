@@ -30,9 +30,12 @@ class Main extends Scene {
     private cursors: Phaser.Types.Input.Keyboard.CursorKeys | null = null;
     private ball: Phaser.Types.Physics.Arcade.ImageWithDynamicBody | null = null;
 
+    private arrow: GameObjects.Image | null = null;
+
     preload() {
         this.load.image('bg', 'assets/bg.png');
         this.load.image('ball', 'assets/ball.png');
+        this.load.image('arrow', 'assets/arrow.png');
     }
 
     create() {
@@ -42,14 +45,41 @@ class Main extends Scene {
         this.ball.setCollideWorldBounds(true);
 
         this.cursors = this.input.keyboard!.createCursorKeys();
+
+        this.arrow = this.add.image(400, 300, 'arrow');
+        this.arrow.setVisible(false);
     }
 
     update(time: number, delta: number) {
-        if (this.cursors!.left.isDown) {
-            this.ball!.setVelocityX(-160);
+        if (this.input.mousePointer.isDown) {
+            // Just take the drag delta x and use that to compute the rotation,
+            // this is terrible ux but it works.
+            let d = this.input.mousePointer.getDistanceX() / 200;
+            if (this.input.mousePointer.downX > this.input.mousePointer.x) {
+                d = d * -1;
+            }
+            let r = d * 2 * Math.PI;
+            const scaleFactor = (Phaser.Math.Clamp(
+                Math.abs(this.input.mousePointer.getDistanceY()),
+                50,
+                200
+            ) - 50) / 150;
 
-        } else if (this.cursors!.right.isDown) {
-            this.ball!.setVelocityX(160);
+            this.arrow!.setScale(.6 + scaleFactor);
+            this.arrow!.rotation = r;
+            const arrowHeight = 128 * (.6 + scaleFactor);
+            const p = Phaser.Math.RotateAround(
+                { x: this.ball!.x, y: this.ball!.y - (arrowHeight / 2) - 10 },
+                this.ball!.x,
+                this.ball!.y,
+                r
+            );
+            this.arrow!.x = p.x;
+            this.arrow!.y = p.y;
+            this.arrow!.setVisible(true);
+        } else {
+            // Do not.
+            this.arrow!.setVisible(false);
         }
     }
 }
@@ -82,7 +112,6 @@ async function onAuthChange(user: User | null) {
 
 window.addEventListener('load', async () => {
     const game = new Phaser.Game(config);
-
 
     onAuthStateChanged(getAuth(), onAuthChange);
     try {
