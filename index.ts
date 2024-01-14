@@ -1,11 +1,11 @@
 // Import the functions you need from the SDKs you need
+import { GameObjects, Scene } from "phaser";
+// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { User, getAuth, onAuthStateChanged, signInAnonymously } from "firebase/auth";
 import { getDatabase, ref, set, onDisconnect, onChildAdded } from "firebase/database";
 
 import { getAnalytics } from "firebase/analytics";
-import { GameObjects, Scene } from "phaser";
-
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
