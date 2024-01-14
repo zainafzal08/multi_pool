@@ -118,7 +118,8 @@ class Main extends Scene {
      * minimum force, not that no force should be applied.
      */
     hitBall(direction: Phaser.Math.Vector2, force: number) {
-        // TODO
+        console.log('Hit ball with direction', direction, 'and force', force);
+        this.localBall!.applyForce(direction.scale(force * 0.01));
     }
 }
 
