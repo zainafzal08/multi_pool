@@ -37,10 +37,15 @@ class Main extends Scene {
     private dragCircle: GameObjects.Graphics | null = null;
     private lastUserInput: { direction: Phaser.Math.Vector2, force: number } | null = null;
     private dragCircleRadius = 50;
-
+    private ballimages = ['assets/ball.png', 'assets/ballB.png', 'assets/ballR.png']
+    
+    randomFromArray(array: any[]) {
+        return array[Math.floor(Math.random() * array.length)];
+    }
     preload() {
         this.load.image('bg', 'assets/bg.png');
-        this.load.image('ball', 'assets/ball.png');
+        this.load.image('ball', this.randomFromArray(this.ballimages));
+        this.load.image('gball', 'assets/ballW.png');
         this.load.image('arrow', 'assets/arrow.png');
 
     }
@@ -48,8 +53,9 @@ class Main extends Scene {
     create() {
         const bg = this.add.image(400, 300, 'bg');
         bg.setScale(.5);
-        this.localBall = this.createBalls(400, 300);
-        this.testBall = this.createBalls(600, 300);
+        
+        this.localBall = this.createBalls(100 + Math.random()*400,100 + Math.random()*400, 'ball');
+        this.testBall = this.createBalls(600, 300, 'gball');
         this.dragCircle = this.add.graphics();
         this.dragCircle.lineStyle(2, 0xffffff, 1);
         this.dragCircle.strokeCircle(0, 0, this.dragCircleRadius);
@@ -61,10 +67,10 @@ class Main extends Scene {
         this.matter.world.setBounds(0, 0, 800, 600);
     }
 
-    createBalls(x: number, y: number) {
+    createBalls(x: number, y: number, img: string) {
         
-        this.ballRef = this.matter.add.sprite(x, y, 'ball');
-        this.ballRef.setCircle(5);
+        this.ballRef = this.matter.add.sprite(x, y, img);
+        this.ballRef.setCircle(8);
         this.ballRef.setFriction(0.0);
         this.ballRef.setBounce(0.99);
         this.ballRef.setDensity(0.1);
