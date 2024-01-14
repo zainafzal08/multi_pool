@@ -30,6 +30,8 @@ const analytics = getAnalytics(app);
 class Main extends Scene {
     /** The ball controlled by the current local player */
     private localBall: Phaser.Physics.Matter.Sprite | null = null;
+    private testBall: Phaser.Physics.Matter.Sprite | null = null;
+    private ballRef: Phaser.Physics.Matter.Sprite | null = null;
     private ballList: Phaser.Physics.Matter.Image[] = [];
     private arrow: GameObjects.Image | null = null;
     private dragCircle: GameObjects.Graphics | null = null;
@@ -46,7 +48,8 @@ class Main extends Scene {
     create() {
         const bg = this.add.image(400, 300, 'bg');
         bg.setScale(.5);
-        this.createBalls();
+        this.localBall = this.createBalls(400, 300);
+        this.testBall = this.createBalls(600, 300);
         this.dragCircle = this.add.graphics();
         this.dragCircle.lineStyle(2, 0xffffff, 1);
         this.dragCircle.strokeCircle(0, 0, this.dragCircleRadius);
@@ -55,19 +58,25 @@ class Main extends Scene {
         this.arrow = this.add.image(400, 300, 'arrow');
         this.arrow.setVisible(false);
         this.arrow.setOrigin(0.5, 1);
+        this.matter.world.setBounds(0, 0, 800, 600);
     }
 
-    createBalls() {
-        this.localBall = this.matter.add.sprite(400, 300, 'ball');
-        this.localBall.setCircle(500);
-        this.localBall.setFriction(0.005);
-        this.localBall.setBounce(0.9);
+    createBalls(x: number, y: number) {
+        
+        this.ballRef = this.matter.add.sprite(x, y, 'ball');
+        this.ballRef.setCircle(5);
+        this.ballRef.setFriction(0.0);
+        this.ballRef.setBounce(0.99);
+        this.ballRef.setDensity(0.1);
+
+        return this.ballRef;
     }
 
     drawUI() {
         if (!this.localBall || !this.arrow || !this.dragCircle) {
             return;
         }
+        this.arrow.setPosition(this.localBall.x, this.localBall.y);
         const center = new Phaser.Math.Vector2(
             this.input.mousePointer.downX, this.input.mousePointer.downY);
         const direction = new Phaser.Math.Vector2(
@@ -119,6 +128,7 @@ class Main extends Scene {
      */
     hitBall(direction: Phaser.Math.Vector2, force: number) {
         console.log('Hit ball with direction', direction, 'and force', force);
+        direction = direction.multiply(new Phaser.Math.Vector2(-1, -1));
         this.localBall!.applyForce(direction.scale(force * 0.01));
     }
 }
