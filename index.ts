@@ -28,7 +28,7 @@ const analytics = getAnalytics(app);
 // Initalize phaser.
 class Main extends Scene {
     private cursors: Phaser.Types.Input.Keyboard.CursorKeys | null = null;
-    private ball: Phaser.Types.Physics.Arcade.ImageWithDynamicBody | null = null;
+    private ball: Phaser.Types.Physics.Matter.MatterBody | null = null;
 
     private arrow: GameObjects.Image | null = null;
 
@@ -41,8 +41,8 @@ class Main extends Scene {
     create() {
         const bg = this.add.image(400, 300, 'bg');
         bg.setScale(.5);
-        this.ball = this.physics.add.image(400, 300, 'ball');
-        this.ball.setCollideWorldBounds(true);
+        this.ball = this.matter.add.image(400, 300, 'ball');
+        //this.ball.setCollideWorldBounds(true);
 
         this.cursors = this.input.keyboard!.createCursorKeys();
 
@@ -90,8 +90,14 @@ const config = {
     height: 600,
     scene: Main,
     physics: {
-        default: 'arcade',
-        arcade: {}
+        default: 'matter',
+        matter: {
+            gravity: {
+                x: 0,
+                y: 0,
+            },
+            debug: true,
+        }
     }
 };
 
