@@ -1,24 +1,22 @@
 // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { User, getAuth, onAuthStateChanged, signInAnonymously } from "firebase/auth";
-import { getDatabase, ref, set, onDisconnect } from "firebase/database";
-
-import { getAnalytics } from "firebase/analytics";
 import { GameObjects, Scene } from "phaser";
-
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-    apiKey: "AIzaSyCGvK9BoWKmtOxotM6ZpvCuHIQIH8RxcIE",
-    authDomain: "ballpool-a072f.firebaseapp.com",
-    projectId: "ballpool-a072f",
-    storageBucket: "ballpool-a072f.appspot.com",
-    messagingSenderId: "79831655126",
-    appId: "1:79831655126:web:54ba1bb3cf2e1fc7215f77",
-    measurementId: "G-0QNVMXSGST"
+  apiKey: "AIzaSyCGvK9BoWKmtOxotM6ZpvCuHIQIH8RxcIE",
+  authDomain: "ballpool-a072f.firebaseapp.com",
+  databaseURL: "https://ballpool-a072f-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "ballpool-a072f",
+  storageBucket: "ballpool-a072f.appspot.com",
+  messagingSenderId: "79831655126",
+  appId: "1:79831655126:web:54ba1bb3cf2e1fc7215f77",
+  measurementId: "G-0QNVMXSGST"
 };
 
 // Initialize Firebase
@@ -29,6 +27,7 @@ const analytics = getAnalytics(app);
 class Main extends Scene {
     private cursors: Phaser.Types.Input.Keyboard.CursorKeys | null = null;
     private ball: Phaser.Types.Physics.Matter.MatterBody | null = null;
+    
 
     private arrow: GameObjects.Image | null = null;
 
@@ -36,9 +35,14 @@ class Main extends Scene {
         this.load.image('bg', 'assets/bg.png');
         this.load.image('ball', 'assets/ball.png');
         this.load.image('arrow', 'assets/arrow.png');
+        
     }
 
     create() {
+        const allPlayers = firebase.database().ref('players');
+        allPlayers.on("child_added", function (snapshot) {
+            console.log(snapshot.val());
+        })
         const bg = this.add.image(400, 300, 'bg');
         bg.setScale(.5);
         this.ball = this.matter.add.image(400, 300, 'ball');
@@ -48,6 +52,7 @@ class Main extends Scene {
 
         this.arrow = this.add.image(400, 300, 'arrow');
         this.arrow.setVisible(false);
+        
     }
 
     update(time: number, delta: number) {
@@ -115,6 +120,9 @@ async function onAuthChange(user: User | null) {
         onDisconnect(playerRef).remove();
     }
 }
+
+
+
 
 window.addEventListener('load', async () => {
     const game = new Phaser.Game(config);
