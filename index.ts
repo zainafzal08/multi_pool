@@ -1,22 +1,25 @@
 // Import the functions you need from the SDKs you need
-import { GameObjects, Scene } from "phaser";
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
+import { User, getAuth, onAuthStateChanged, signInAnonymously } from "firebase/auth";
+import { getDatabase, ref, set, onDisconnect } from "firebase/database";
+
 import { getAnalytics } from "firebase/analytics";
+import { GameObjects, Scene } from "phaser";
+
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyCGvK9BoWKmtOxotM6ZpvCuHIQIH8RxcIE",
-  authDomain: "ballpool-a072f.firebaseapp.com",
-  databaseURL: "https://ballpool-a072f-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "ballpool-a072f",
-  storageBucket: "ballpool-a072f.appspot.com",
-  messagingSenderId: "79831655126",
-  appId: "1:79831655126:web:54ba1bb3cf2e1fc7215f77",
-  measurementId: "G-0QNVMXSGST"
+    apiKey: "AIzaSyCGvK9BoWKmtOxotM6ZpvCuHIQIH8RxcIE",
+    authDomain: "ballpool-a072f.firebaseapp.com",
+    databaseURL: "https://ballpool-a072f-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "ballpool-a072f",
+    storageBucket: "ballpool-a072f.appspot.com",
+    messagingSenderId: "79831655126",
+    appId: "1:79831655126:web:54ba1bb3cf2e1fc7215f77",
+    measurementId: "G-0QNVMXSGST"
 };
 
 // Initialize Firebase
@@ -39,7 +42,7 @@ class Main extends Scene {
     }
 
     create() {
-        const allPlayers = firebase.database().ref('players');
+        const allPlayers = firebase.da
         allPlayers.on("child_added", function (snapshot) {
             console.log(snapshot.val());
         })
