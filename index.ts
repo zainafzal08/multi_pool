@@ -67,6 +67,7 @@ class Main extends Scene {
         this.matter.world.setBounds(0, 0, 800, 600);
     }
 
+
     createBall(x: number, y: number, type: 'local' | 'goal' | 'remote') {
         let ballSprite = 'ball';
         let holeSprite: string | null = null;
@@ -79,10 +80,11 @@ class Main extends Scene {
         }
 
         const ballRef = this.matter.add.sprite(x, y, ballSprite);
-        ballRef.setCircle(5);
-        ballRef.setFriction(0.0);
-        ballRef.setBounce(0.99);
-        ballRef.setDensity(0.1);
+        ballRef.setCircle(10, { friction:0.3, restitution: 1, density: 0.2 });
+    
+        //ballRef.setFriction(0.0);
+        //ballRef.setBounce(0.99);
+        //ballRef.setDensity(0.1);
 
         // For each player ball create a unique hole.
         if (holeSprite !== null) {
