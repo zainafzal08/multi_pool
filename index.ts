@@ -30,22 +30,21 @@ const analytics = getAnalytics(app);
 class Main extends Scene {
     /** The ball controlled by the current local player */
     private localBall: Phaser.Physics.Matter.Sprite | null = null;
-    private testBall: Phaser.Physics.Matter.Sprite | null = null;
-    private ballRef: Phaser.Physics.Matter.Sprite | null = null;
+    private goalBall: Phaser.Physics.Matter.Sprite | null = null;
     private ballList: Phaser.Physics.Matter.Image[] = [];
     private arrow: GameObjects.Image | null = null;
     private dragCircle: GameObjects.Graphics | null = null;
     private lastUserInput: { direction: Phaser.Math.Vector2, force: number } | null = null;
     private dragCircleRadius = 50;
-    private ballimages = ['assets/ball.png', 'assets/ballB.png', 'assets/ballR.png']
-    
-    randomFromArray(array: any[]) {
-        return array[Math.floor(Math.random() * array.length)];
-    }
+    private holeLocations = [{ x: 40, y: 40 }, { x: 760, y: 40 }, { x: 40, y: 560 }, { x: 760, y: 560 }];
+
     preload() {
         this.load.image('bg', 'assets/bg.png');
-        this.load.image('ball', this.randomFromArray(this.ballimages));
-        this.load.image('gball', 'assets/ballW.png');
+        this.load.image('ball', 'assets/ball.png');
+        this.load.image('ball_local', 'assets/ball_local.png');
+        this.load.image('ball_remote', 'assets/ball_remote.png');
+        this.load.image('hole_local', 'assets/hole_local.png');
+        this.load.image('hole_remote', 'assets/hole_remote.png');
         this.load.image('arrow', 'assets/arrow.png');
 
     }
@@ -53,9 +52,9 @@ class Main extends Scene {
     create() {
         const bg = this.add.image(400, 300, 'bg');
         bg.setScale(.5);
-        
-        this.localBall = this.createBalls(100 + Math.random()*400,100 + Math.random()*400, 'ball');
-        this.testBall = this.createBalls(600, 300, 'gball');
+        this.localBall = this.createBall(200, 300, 'local');
+        this.goalBall = this.createBall(400, 300, 'goal');
+
         this.dragCircle = this.add.graphics();
         this.dragCircle.lineStyle(2, 0xffffff, 1);
         this.dragCircle.strokeCircle(0, 0, this.dragCircleRadius);
@@ -64,18 +63,45 @@ class Main extends Scene {
         this.arrow = this.add.image(400, 300, 'arrow');
         this.arrow.setVisible(false);
         this.arrow.setOrigin(0.5, 1);
+
         this.matter.world.setBounds(0, 0, 800, 600);
     }
 
-    createBalls(x: number, y: number, img: string) {
-        
-        this.ballRef = this.matter.add.sprite(x, y, img);
-        this.ballRef.setCircle(8);
-        this.ballRef.setFriction(0.0);
-        this.ballRef.setBounce(0.99);
-        this.ballRef.setDensity(0.1);
+    createBall(x: number, y: number, type: 'local' | 'goal' | 'remote') {
+        let ballSprite = 'ball';
+        let holeSprite: string | null = null;
+        if (type === 'local') {
+            ballSprite = 'ball_local';
+            holeSprite = 'hole_local';
+        } else if (type === 'remote') {
+            ballSprite = 'ball_remote';
+            holeSprite = 'hole_remote';
+        }
 
-        return this.ballRef;
+        const ballRef = this.matter.add.sprite(x, y, ballSprite);
+        ballRef.setCircle(5);
+        ballRef.setFriction(0.0);
+        ballRef.setBounce(0.99);
+        ballRef.setDensity(0.1);
+
+        // For each player ball create a unique hole.
+        if (holeSprite !== null) {
+            const holePos = this.holeLocations.pop()!;
+            const hole = this.matter.add.sprite(holePos.x, holePos.y, holeSprite);
+            hole.setStatic(true);
+            hole.setOnCollide((collisionData: Phaser.Types.Physics.Matter.MatterCollisionData) => {
+                if (
+                    collisionData.bodyA.gameObject !== this.goalBall &&
+                    collisionData.bodyB.gameObject !== this.goalBall) {
+                    return;
+                }
+                // Goal ball was sinked by the player who owns `ballRef`.
+                // Reset the goal ball.
+                this.goalBall!.setPosition(400, 300);
+            });
+        }
+
+        return ballRef;
     }
 
     drawUI() {
@@ -118,8 +144,6 @@ class Main extends Scene {
         } else {
             // If the mouse was held down for more then 200ms register a hit.
             if (this.input.mousePointer.getDuration() > 200) {
-                const direction = { x: 0, y: 0 };
-                const force = 0;
                 this.hitBall(this.lastUserInput!.direction, this.lastUserInput!.force);
             }
             this.hideUI();
@@ -133,7 +157,6 @@ class Main extends Scene {
      * minimum force, not that no force should be applied.
      */
     hitBall(direction: Phaser.Math.Vector2, force: number) {
-        console.log('Hit ball with direction', direction, 'and force', force);
         direction = direction.multiply(new Phaser.Math.Vector2(-1, -1));
         this.localBall!.applyForce(direction.scale(force * 0.01));
     }
@@ -170,7 +193,7 @@ async function onAuthChange(user: User | null) {
                 //this is the opponent add to ref of opponent
             }
         });
-        
+
         await set(playerRef, {
             id: playerID,
             name: "Anonymous",
@@ -179,7 +202,7 @@ async function onAuthChange(user: User | null) {
             ballVX: 0,
             ballVY: 0,
             ballForce: 0,
-            
+
         });
         console.log("Player added to database");
         onDisconnect(playerRef).remove();
